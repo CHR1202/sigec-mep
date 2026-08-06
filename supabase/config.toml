@@ -1,0 +1,4 @@
+project_id = "oadyuziwvsmgkvwwbsbm"
+
+[functions.invite-sigec-user]
+verify_jwt = true

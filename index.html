@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SIGEC - Sistema de Gestión de Convivencia Escolar" />
+  <title>SIGEC</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="app">
+    <!-- LOGIN -->
+    <section id="login-view" class="login-view">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="assets/img/logo-sigec-icon.png" alt="Logo SIGEC" />
+          <div>
+            <h1>SIGEC</h1>
+            <p>Sistema de Gestión de Convivencia Escolar</p>
+          </div>
+        </div>
+
+        <div class="login-copy">
+          <span class="soft-badge">Prototipo institucional</span>
+          <h2>Bienvenido</h2>
+          <p>Ingrese para registrar, consultar y dar seguimiento a la información de convivencia escolar.</p>
+        </div>
+
+        <form id="login-form">
+          <label for="email">Correo institucional</label>
+          <input id="email" type="email" placeholder="correo@ejemplo.go.cr" required />
+
+          <label for="password">Contraseña</label>
+          <div class="password-field">
+            <input id="password" type="password" placeholder="Ingrese su contraseña" required />
+            <button type="button" id="toggle-password" aria-label="Mostrar u ocultar contraseña">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            Ingresar
+          </button>
+
+          <p class="login-note">El acceso se valida de forma segura mediante Supabase Auth.</p>
+        </form>
+      </div>
+
+      <div class="login-panel">
+        <div class="panel-orb orb-one"></div>
+        <div class="panel-orb orb-two"></div>
+        <div class="panel-content">
+          <img src="assets/img/logo-sigec-icon.png" alt="" />
+          <h2>Información organizada desde su origen.</h2>
+          <p>Un solo sistema para formularios, seguimiento, consultas y reportes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SISTEMA -->
+    <section id="system-view" class="system-shell hidden">
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo-sigec-icon.png" alt="Logo SIGEC" />
+          <div class="brand-copy">
+            <strong>SIGEC</strong>
+            <span>Sistema de Gestión de<br />Convivencia Escolar</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-link staff-only active" data-view="dashboard">
+            <i class="fa-solid fa-house"></i><span>Dashboard</span>
+          </button>
+
+          <div class="nav-section staff-only">
+            <span>Gestión</span><div></div>
+          </div>
+
+          <button class="nav-link staff-only" data-view="centros">
+            <i class="fa-regular fa-building"></i><span>Centros Educativos</span>
+          </button>
+          <button class="nav-link staff-only" data-view="grupo-consulta">
+            <i class="fa-solid fa-people-group"></i><span>Grupo de Convivencia</span>
+          </button>
+          <button class="nav-link staff-only" data-view="plan-consulta">
+            <i class="fa-regular fa-file-lines"></i><span>Plan de Convivencia</span>
+          </button>
+          <button class="nav-link staff-only" data-view="seguimientos">
+            <i class="fa-regular fa-calendar-check"></i><span>Seguimientos</span>
+          </button>
+          <button class="nav-link staff-only" data-view="respuestas">
+            <i class="fa-solid fa-magnifying-glass"></i><span>Respuestas / Consultas</span>
+          </button>
+
+          <div class="nav-section admin-only">
+            <span>Administración</span><div></div>
+          </div>
+
+          <button class="nav-link admin-only" data-view="usuarios">
+            <i class="fa-regular fa-user"></i><span>Usuarios</span>
+          </button>
+          <button class="nav-link admin-only" data-view="historial">
+            <i class="fa-solid fa-clock-rotate-left"></i><span>Historial de Cambios</span>
+          </button>
+          <button class="nav-link admin-only" data-view="reportes">
+            <i class="fa-solid fa-chart-simple"></i><span>Reportes</span>
+          </button>
+
+          <button class="nav-link center-only active" data-view="datos-centro">
+            <i class="fa-regular fa-building"></i><span>Datos del Centro</span>
+          </button>
+          <button class="nav-link center-only" data-view="grupo">
+            <i class="fa-solid fa-people-group"></i><span>Grupo de Convivencia</span>
+          </button>
+          <button class="nav-link center-only" data-view="plan">
+            <i class="fa-regular fa-file-lines"></i><span>Plan de Convivencia</span>
+          </button>
+          <button class="nav-link center-only" data-view="mis-envios">
+            <i class="fa-regular fa-paper-plane"></i><span>Mis Envíos</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button id="logout-button" class="nav-link logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button id="sidebar-toggle" class="icon-button" aria-label="Abrir o cerrar menú">
+              <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <h2 id="page-title">Dashboard</h2>
+          </div>
+
+          <div class="topbar-right"><span id="connection-status" class="connection-status">Conectando…</span>
+            <div id="role-pill" class="role-pill">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span id="current-role">Administrador</span>
+            </div>
+            <div class="avatar"><i class="fa-solid fa-user"></i></div>
+            <button class="icon-button small"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+        </header>
+
+        <div class="content">
+          <!-- DASHBOARD -->
+          <section id="dashboard" class="content-view">
+            <div class="welcome-row">
+              <div>
+                <h1>Bienvenido al SIGEC</h1>
+                <p>Sistema de Gestión de Convivencia Escolar</p>
+              </div>
+              <div class="date-card">
+                <i class="fa-regular fa-calendar"></i>
+                <span id="current-date"></span>
+              </div>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card">
+                <div class="metric-icon blue"><i class="fa-regular fa-building"></i></div>
+                <div><strong id="stat-centros">0</strong><span>Centros Educativos</span><small>Registrados</small></div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-icon green"><i class="fa-solid fa-people-group"></i></div>
+                <div><strong id="stat-grupos">0</strong><span>Formularios Grupo</span><small>Enviados</small></div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-icon orange"><i class="fa-regular fa-file-lines"></i></div>
+                <div><strong id="stat-planes">0</strong><span>Planes de Convivencia</span><small>Enviados</small></div>
+              </article>
+              <article class="metric-card">
+                <div class="metric-icon purple"><i class="fa-regular fa-calendar-check"></i></div>
+                <div><strong id="stat-seguimientos">0</strong><span>Seguimientos</span><small>Registrados</small></div>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <article class="panel-card activity-panel">
+                <div class="panel-heading">
+                  <div><i class="fa-solid fa-list-check"></i><h3>Actividad Reciente</h3></div>
+                  <button class="btn btn-light btn-small" data-view-jump="historial">Ver todo</button>
+                </div>
+                <div id="activity-content" class="empty-activity">
+                  <div class="folder-illustration">
+                    <i class="fa-solid fa-folder"></i>
+                  </div>
+                  <h4>Aún no hay actividad registrada</h4>
+                  <p>Cuando se envíen formularios o se realicen acciones,<br />aparecerán aquí.</p>
+                </div>
+              </article>
+
+              <article class="panel-card">
+                <div class="panel-heading">
+                  <div><i class="fa-solid fa-bolt"></i><h3>Accesos Rápidos</h3></div>
+                </div>
+                <div class="quick-grid">
+                  <button class="quick-card" data-view-jump="centros">
+                    <span class="quick-icon blue"><i class="fa-regular fa-building"></i></span>
+                    <span><strong>Registrar Centro</strong><small>Nuevo centro educativo</small></span>
+                  </button>
+                  <button class="quick-card" data-view-jump="grupo-consulta">
+                    <span class="quick-icon green"><i class="fa-solid fa-people-group"></i></span>
+                    <span><strong>Grupo de Convivencia</strong><small>Nuevo formulario</small></span>
+                  </button>
+                  <button class="quick-card" data-view-jump="plan-consulta">
+                    <span class="quick-icon orange"><i class="fa-regular fa-file-lines"></i></span>
+                    <span><strong>Plan de Convivencia</strong><small>Nuevo plan</small></span>
+                  </button>
+                  <button class="quick-card" data-view-jump="seguimientos">
+                    <span class="quick-icon purple"><i class="fa-regular fa-calendar-check"></i></span>
+                    <span><strong>Nuevo Seguimiento</strong><small>Registrar seguimiento</small></span>
+                  </button>
+                  <button class="quick-card wide" data-view-jump="respuestas">
+                    <span class="quick-icon blue"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <span><strong>Consultar Respuestas</strong><small>Ver formularios enviados</small></span>
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            <footer class="system-footer">
+              <span>SIGEC - Sistema de Gestión de Convivencia Escolar</span>
+              <span>Ministerio de Educación Pública de Costa Rica</span>
+            </footer>
+          </section>
+
+          <!-- CENTROS -->
+          <section id="centros" class="content-view hidden">
+            <div class="page-heading">
+              <div><span class="soft-badge">Gestión</span><h1>Centros Educativos</h1><p>Consulta centralizada de los centros registrados.</p></div>
+              <button class="btn btn-primary" data-view-jump="datos-centro"><i class="fa-solid fa-plus"></i> Registrar centro</button>
+            </div>
+            <div class="data-card">
+              <div class="table-toolbar">
+                <div class="search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="center-search" placeholder="Buscar centro o código..." /></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Código</th><th>Centro educativo</th><th>Región</th><th>Circuito</th><th>Modalidad</th></tr></thead>
+                  <tbody id="centros-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- CONSULTAS SIMPLES -->
+          <section id="grupo-consulta" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Gestión</span><h1>Grupo de Convivencia</h1><p>Consulta de formularios enviados por los centros educativos.</p></div></div>
+            <div class="data-card"><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Centro</th><th>Código</th><th>Estado</th><th>Correo</th></tr></thead><tbody id="group-table"></tbody></table></div></div>
+          </section>
+
+          <section id="plan-consulta" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Gestión</span><h1>Plan de Convivencia</h1><p>Consulta de planes registrados.</p></div></div>
+            <div class="data-card"><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Centro</th><th>Código</th><th>Estado</th><th>Correo</th></tr></thead><tbody id="plan-table"></tbody></table></div></div>
+          </section>
+
+          <section id="seguimientos" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Gestión</span><h1>Seguimientos</h1><p>Este módulo se habilitará cuando se definan las preguntas de seguimiento.</p></div></div>
+            <div class="empty-module"><i class="fa-regular fa-calendar-check"></i><h3>Módulo preparado</h3><p>Aún no se han incorporado formularios de seguimiento.</p></div>
+          </section>
+
+          <!-- DATOS CENTRO -->
+          <section id="datos-centro" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Centro educativo</span><h1>Datos del Centro</h1><p>Registre estos datos una sola vez. El sistema los reutilizará en ambos formularios.</p></div></div>
+            <form id="center-form" class="form-card">
+              <div class="form-section-title"><i class="fa-regular fa-building"></i><div><h3>Identificación del centro</h3><p>Complete todos los campos obligatorios.</p></div></div>
+              <div class="form-grid two">
+                <div class="field full"><label for="centerName">Nombre del centro educativo *</label><input id="centerName" required /></div>
+                <div class="field"><label for="budgetCode">Código presupuestario de cuatro dígitos *</label><input id="budgetCode" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="Ejemplo: 0123" required /></div>
+                <div class="field"><label for="region">Dirección Regional de Educación *</label><input id="region" placeholder="Ejemplo: Limón" required /></div>
+                <div class="field"><label for="circuit">Circuito educativo *</label><select id="circuit" required><option value="">Seleccione</option></select></div>
+                <div class="field"><label for="modality">Modalidad del centro educativo *</label>
+                  <select id="modality" required>
+                    <option value="">Seleccione</option>
+                    <option>Preescolar</option><option>I y II Ciclo (diurna-nocturna)</option>
+                    <option>Secundaria (diurna-nocturna)</option><option>Centro de Educación Especial (CEE)</option>
+                    <option>Centro de Atención Integral para Personas Adultas con Discapacidad (CAIPAD)</option>
+                    <option>Instituto Profesional de Educación Comunitaria (IPEC)</option>
+                    <option>Centro Integrado de Educación de Adultos (CINDEA)</option>
+                    <option>Colegio Nacional de Educación a Distancia (CONED)</option>
+                  </select>
+                </div>
+                <div class="field"><label for="contactName">Persona coordinadora del grupo de convivencia *</label><input id="contactName" required /></div>
+                <div class="field"><label for="contactEmail">Correo institucional MEP *</label><input id="contactEmail" type="email" required /></div>
+              </div>
+              <div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fa-regular fa-floppy-disk"></i> Guardar datos</button></div>
+            </form>
+          </section>
+
+          <!-- FORMULARIO GRUPO -->
+          <section id="grupo" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Formulario 2026</span><h1>Grupo de Convivencia</h1><p>Complete la información sobre la conformación del grupo del centro educativo.</p></div></div>
+            <div class="info-banner"><i class="fa-solid fa-circle-info"></i><span>Antes de completar este formulario, guarde los datos del centro educativo.</span></div>
+            <form id="group-form" class="form-card">
+              <fieldset>
+                <legend>Conformación del grupo</legend>
+                <div class="field">
+                  <label>¿El centro educativo cuenta con un grupo de convivencia? *</label>
+                  <div class="choice-row"><label><input type="radio" name="hasGroup" value="Sí" required /> Sí</label><label><input type="radio" name="hasGroup" value="No" /> No</label></div>
+                </div>
+                <div class="field">
+                  <label>¿La persona directora forma parte del grupo de convivencia? *</label>
+                  <div class="choice-row"><label><input type="radio" name="directorMember" value="Sí" required /> Sí</label><label><input type="radio" name="directorMember" value="No" /> No</label></div>
+                </div>
+                <div class="form-grid two">
+                  <div class="field"><label for="studentTotal">Cantidad total de estudiantes integrantes *</label><input id="studentTotal" type="number" min="0" required /></div>
+                  <div class="field"><label for="maleStudents">Cantidad de estudiantes hombres *</label><input id="maleStudents" type="number" min="0" required /></div>
+                  <div class="field"><label for="femaleStudents">Cantidad de estudiantes mujeres *</label><input id="femaleStudents" type="number" min="0" required /></div>
+                  <div class="field"><label for="staffCount">Representantes del personal docente, técnico-administrativo o equipo interdisciplinario *</label><input id="staffCount" type="number" min="0" required /></div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Distribución por grupo etario</legend>
+                <p class="help-text">Indique cero cuando no haya integrantes en una categoría.</p>
+                <div class="form-grid age-grid">
+                  <div class="field"><label for="ageEarly">Primera infancia (0 a 5 años)</label><input id="ageEarly" type="number" min="0" value="0" required /></div>
+                  <div class="field"><label for="ageChild">Niñez (6 a 11 años)</label><input id="ageChild" type="number" min="0" value="0" required /></div>
+                  <div class="field"><label for="ageTeen">Adolescencia (12 a 17 años)</label><input id="ageTeen" type="number" min="0" value="0" required /></div>
+                  <div class="field"><label for="ageYouth">Personas jóvenes (18 a 35 años)</label><input id="ageYouth" type="number" min="0" value="0" required /></div>
+                  <div class="field"><label for="ageAdult">Adultez (36 a 64 años)</label><input id="ageAdult" type="number" min="0" value="0" required /></div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Otras personas integrantes</legend>
+                <div class="checkbox-grid">
+                  <label><input type="checkbox" name="otherMembers" value="Familia" /> Familia</label>
+                  <label><input type="checkbox" name="otherMembers" value="Junta de educación" /> Junta de educación</label>
+                  <label><input type="checkbox" name="otherMembers" value="Ninguna" /> Ninguna de las anteriores</label>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Documento de respaldo</legend>
+                <div class="field"><label for="groupFile">Adjunte el documento del grupo de convivencia</label><input id="groupFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*,audio/*" /><p class="help-text">En esta versión local se almacena únicamente el nombre del archivo.</p></div>
+              </fieldset>
+              <div class="form-actions"><button type="button" class="btn btn-light" data-save="group">Guardar borrador</button><button type="submit" class="btn btn-primary">Enviar formulario</button></div>
+            </form>
+          </section>
+
+          <!-- FORMULARIO PLAN -->
+          <section id="plan" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Formulario 2026</span><h1>Plan de Convivencia Pacífica</h1><p>Registre el diagnóstico y las acciones previstas para el centro educativo.</p></div></div>
+            <div class="info-banner"><i class="fa-solid fa-circle-info"></i><span>Antes de completar este formulario, guarde los datos del centro educativo.</span></div>
+            <form id="plan-form" class="form-card">
+              <fieldset>
+                <legend>Diagnóstico de convivencia</legend>
+                <div class="field">
+                  <label>¿El centro educativo realizó un diagnóstico de la convivencia? *</label>
+                  <div class="choice-row"><label><input type="radio" name="diagnosisDone" value="Sí" required /> Sí</label><label><input type="radio" name="diagnosisDone" value="No" /> No</label></div>
+                </div>
+                <div class="field">
+                  <label>Herramientas utilizadas para elaborar el diagnóstico *</label>
+                  <div class="checkbox-grid">
+                    <label><input type="checkbox" name="tools" value="Mapa de la convivencia" /> Mapa de la convivencia</label>
+                    <label><input type="checkbox" name="tools" value="CREA" /> CREA</label>
+                    <label><input type="checkbox" name="tools" value="Formularios en línea" /> Formularios en línea</label>
+                    <label><input type="checkbox" name="tools" value="FODA" /> FODA</label>
+                    <label><input type="checkbox" name="tools" value="Cuestionarios físicos" /> Cuestionarios aplicados en físico</label>
+                    <label><input type="checkbox" name="tools" value="Entrevistas" /> Entrevistas</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>¿Los resultados del diagnóstico se consideraron para elaborar el Plan Estratégico 2026? *</label>
+                  <div class="choice-row"><label><input type="radio" name="diagnosisUsed" value="Sí" required /> Sí</label><label><input type="radio" name="diagnosisUsed" value="No" /> No</label></div>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Plan de convivencia pacífica</legend>
+                <div class="field">
+                  <label>¿El centro educativo cuenta con un Plan de Convivencia Pacífica 2026? *</label>
+                  <div class="choice-row"><label><input type="radio" name="hasPlan" value="Sí" required /> Sí</label><label><input type="radio" name="hasPlan" value="No" /> No</label></div>
+                </div>
+                <div class="field">
+                  <label>Líneas estratégicas que se trabajarán — seleccione exactamente tres *</label>
+                  <div class="checkbox-grid">
+                    <label><input type="checkbox" name="strategies" value="Promoción del arte" /> Promoción del arte</label>
+                    <label><input type="checkbox" name="strategies" value="Derechos humanos y deberes ciudadanos" /> Derechos humanos y deberes ciudadanos</label>
+                    <label><input type="checkbox" name="strategies" value="Habilidades para la convivencia" /> Habilidades para la convivencia</label>
+                    <label><input type="checkbox" name="strategies" value="Igualdad y equidad de género" /> Igualdad y equidad de género</label>
+                    <label><input type="checkbox" name="strategies" value="Fortalecimiento de las familias" /> Fortalecimiento de las familias</label>
+                    <label><input type="checkbox" name="strategies" value="Prácticas restaurativas y resolución de conflictos" /> Prácticas restaurativas y resolución de conflictos</label>
+                    <label><input type="checkbox" name="strategies" value="Salud mental" /> Salud mental</label>
+                    <label><input type="checkbox" name="strategies" value="Participación de las comunidades" /> Participación de las comunidades</label>
+                    <label><input type="checkbox" name="strategies" value="Cultura de paz" /> Cultura de paz</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Manifestaciones de violencia que se abordarán — seleccione exactamente dos *</label>
+                  <div class="checkbox-grid">
+                    <label><input type="checkbox" name="violence" value="Acoso y hostigamiento sexual" /> Acoso y hostigamiento sexual</label>
+                    <label><input type="checkbox" name="violence" value="Agresión entre pares" /> Agresión entre pares</label>
+                    <label><input type="checkbox" name="violence" value="Bullying" /> Bullying</label>
+                    <label><input type="checkbox" name="violence" value="Ciberbullying y otras violencias en línea" /> Ciberbullying y otras violencias en línea</label>
+                    <label><input type="checkbox" name="violence" value="Violencia física" /> Violencia física</label>
+                    <label><input type="checkbox" name="violence" value="Violencia intrafamiliar" /> Violencia intrafamiliar</label>
+                    <label><input type="checkbox" name="violence" value="Violencia psicológica" /> Violencia psicológica</label>
+                    <label><input type="checkbox" name="violence" value="Violencia sexual" /> Violencia sexual</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Otras situaciones de vulnerabilidad o riesgo identificadas *</label>
+                  <div class="checkbox-grid">
+                    <label><input type="checkbox" name="risks" value="Amenaza de tiroteo" /> Amenaza de tiroteo</label>
+                    <label><input type="checkbox" name="risks" value="Discriminación" /> Discriminación</label>
+                    <label><input type="checkbox" name="risks" value="Embarazo adolescente" /> Embarazo adolescente</label>
+                    <label><input type="checkbox" name="risks" value="Exclusión educativa" /> Exclusión educativa</label>
+                    <label><input type="checkbox" name="risks" value="Fenómeno de drogas" /> Fenómeno de drogas</label>
+                    <label><input type="checkbox" name="risks" value="Tenencia y uso de armas" /> Tenencia y uso de armas</label>
+                    <label><input type="checkbox" name="risks" value="Trata de personas" /> Trata de personas</label>
+                    <label><input type="checkbox" name="risks" value="Otra" /> Otra situación</label>
+                  </div>
+                  <input id="otherRisk" placeholder="Describa otra situación, si corresponde" />
+                </div>
+                <div class="field">
+                  <label>¿El plan incluyó propuestas formuladas por la población estudiantil? *</label>
+                  <div class="choice-row"><label><input type="radio" name="studentProposals" value="Sí" required /> Sí</label><label><input type="radio" name="studentProposals" value="No" /> No</label></div>
+                </div>
+                <div class="field">
+                  <label for="studentInvolvement">Nivel de involucramiento estudiantil: <strong id="involvementValue">5</strong>/10 *</label>
+                  <input id="studentInvolvement" type="range" min="0" max="10" value="5" />
+                  <div class="range-labels"><span>0 — Ningún involucramiento</span><span>10 — Máximo involucramiento</span></div>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Documento de respaldo</legend>
+                <div class="field"><label for="planFile">Adjunte el Plan de Convivencia Pacífica 2026</label><input id="planFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*,audio/*" /></div>
+              </fieldset>
+
+              <div class="form-actions"><button type="button" class="btn btn-light" data-save="plan">Guardar borrador</button><button type="submit" class="btn btn-primary">Enviar formulario</button></div>
+            </form>
+          </section>
+
+          <!-- RESPUESTAS -->
+          <section id="respuestas" class="content-view hidden">
+            <div class="page-heading">
+              <div><span class="soft-badge">Consulta</span><h1>Respuestas y Consultas</h1><p>Consulte los formularios registrados en el prototipo.</p></div>
+              <button id="export-button" class="btn btn-light"><i class="fa-solid fa-file-export"></i> Exportar CSV</button>
+            </div>
+            <div class="data-card">
+              <div class="table-wrap">
+                <table><thead><tr><th>Fecha</th><th>Centro</th><th>Código</th><th>Formulario</th><th>Estado</th><th>Correo</th></tr></thead><tbody id="responses-table"></tbody></table>
+              </div>
+            </div>
+          </section>
+
+          <section id="mis-envios" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Centro educativo</span><h1>Mis Envíos</h1><p>Formularios registrados desde esta cuenta.</p></div></div>
+            <div class="data-card"><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Formulario</th><th>Centro</th><th>Estado</th></tr></thead><tbody id="my-submissions-table"></tbody></table></div></div>
+          </section>
+
+          <section id="usuarios" class="content-view hidden">
+            <div class="page-heading">
+              <div>
+                <span class="soft-badge">Administración</span>
+                <h1>Usuarios</h1>
+                <p>Invite cuentas nuevas y asigne el nivel de acceso correspondiente.</p>
+              </div>
+              <button id="open-invite-modal" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus"></i>
+                Invitar usuario
+              </button>
+            </div>
+
+            <div class="data-card">
+              <div class="table-toolbar users-toolbar">
+                <div class="search-field">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input id="user-search" placeholder="Buscar por nombre o correo..." />
+                </div>
+                <select id="user-role-filter" class="compact-select">
+                  <option value="">Todos los roles</option>
+                  <option value="admin">Administrador</option>
+                  <option value="consulta">Consulta y seguimiento</option>
+                  <option value="centro">Centro educativo</option>
+                </select>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Correo</th>
+                      <th>Rol</th>
+                      <th>Estado</th>
+                      <th>Creado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="historial" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Administración</span><h1>Historial de Cambios</h1><p>Registro de acciones realizadas en esta versión del prototipo.</p></div><button id="clear-history-button" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Limpiar historial</button></div>
+            <div class="data-card"><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody id="history-table"></tbody></table></div></div>
+          </section>
+
+          <section id="reportes" class="content-view hidden">
+            <div class="page-heading"><div><span class="soft-badge">Administración</span><h1>Reportes</h1><p>Espacio reservado para la integración realizada por el compañero encargado de Power BI.</p></div></div>
+            <div class="empty-module"><i class="fa-solid fa-chart-simple"></i><h3>Power BI pendiente</h3><p>Este módulo queda listo para insertar el dashboard mediante un iframe.</p></div>
+          </section>
+        </div>
+      </main>
+    </section>
+  </div>
+
+
+  <div id="invite-user-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="soft-badge">Administración</span>
+          <h2 id="invite-modal-title">Invitar usuario</h2>
+          <p>Supabase enviará un correo para que la persona establezca su acceso.</p>
+        </div>
+        <button id="close-invite-modal" class="icon-button" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="invite-user-form">
+        <div class="form-grid two">
+          <div class="field full">
+            <label for="invite-full-name">Nombre completo *</label>
+            <input id="invite-full-name" autocomplete="name" required />
+          </div>
+
+          <div class="field full">
+            <label for="invite-email">Correo electrónico *</label>
+            <input id="invite-email" type="email" autocomplete="email" required />
+          </div>
+
+          <div class="field full">
+            <label for="invite-role">Rol autorizado *</label>
+            <select id="invite-role" required>
+              <option value="">Seleccione un rol</option>
+              <option value="centro">Centro educativo</option>
+              <option value="consulta">Consulta y seguimiento</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div id="admin-confirmation-field" class="field full hidden">
+            <label for="admin-confirmation">
+              Confirmación para otorgar acceso administrativo *
+            </label>
+            <input
+              id="admin-confirmation"
+              placeholder="Escriba CONFIRMAR"
+              autocomplete="off"
+            />
+            <p class="help-text">
+              Un administrador puede consultar y modificar información sensible del sistema.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-notice">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>
+            La invitación se procesa mediante una Supabase Edge Function.
+            La clave privilegiada nunca se expone en GitHub Pages.
+          </span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancel-invite" class="btn btn-light">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-regular fa-paper-plane"></i>
+            Enviar invitación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <!-- Librería oficial de Supabase para aplicaciones web sin npm. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Credenciales públicas y creación del cliente. -->
+  <script src="supabase-config.js"></script>
+  <!-- Lógica principal de SIGEC. -->
+  <script src="app.js"></script>
+</body>
+</html>
