@@ -40,7 +40,8 @@ const state = {
   period: null,
   records: [],
   history: [],
-  users: []
+  users: [],
+  accessRequests: []
 };
 
 /** Títulos que aparecen en la barra superior. */
@@ -52,6 +53,7 @@ const titles = {
   seguimientos: "Seguimientos",
   respuestas: "Respuestas / Consultas",
   usuarios: "Usuarios",
+  solicitudes: "Solicitudes de Acceso",
   historial: "Historial de Cambios",
   reportes: "Reportes",
   "datos-centro": "Datos del Centro",
@@ -238,6 +240,10 @@ async function openSystem(session) {
 
   await fetchOpenPeriod();
   await fetchMyCenter();
+
+  if (state.profile.role === "admin") {
+    try { await fetchAccessRequests(); } catch (error) { console.warn("No fue posible cargar solicitudes:", error); }
+  }
 
   const initialView =
     state.profile.role === "centro" ? "datos-centro" : "dashboard";
@@ -1046,6 +1052,11 @@ async function refreshDataForView(viewId) {
     return;
   }
 
+  if (viewId === "solicitudes") {
+    renderAccessRequests(await fetchAccessRequests());
+    return;
+  }
+
   if (viewId === "usuarios") {
     renderUsers(await fetchUsers());
     return;
@@ -1158,6 +1169,66 @@ if (clearHistoryButton) {
     }
   });
 }
+
+/* ------------------------------------------------------------
+ * 8. SOLICITUDES DE ACCESO
+ * ---------------------------------------------------------- */
+
+function openAccessRequestModal(){ $("access-request-modal").classList.remove("hidden"); $("request-full-name").focus(); }
+function closeAccessRequestModal(){ $("access-request-modal").classList.add("hidden"); $("access-request-form").reset(); $("request-admin-warning").classList.add("hidden"); }
+$("open-access-request")?.addEventListener("click",openAccessRequestModal);
+$("close-access-request")?.addEventListener("click",closeAccessRequestModal);
+$("cancel-access-request")?.addEventListener("click",closeAccessRequestModal);
+$("access-request-modal")?.addEventListener("click",e=>{if(e.target.id==="access-request-modal")closeAccessRequestModal();});
+$("request-role")?.addEventListener("change",e=>$("request-admin-warning").classList.toggle("hidden",e.target.value!=="admin"));
+
+$("access-request-form")?.addEventListener("submit",async(event)=>{
+  event.preventDefault();
+  const fullName=$("request-full-name").value.trim();
+  const email=$("request-email").value.trim().toLowerCase();
+  const requestedRole=$("request-role").value;
+  const button=event.submitter;
+  if(!fullName||!email||!requestedRole){showToast("Complete todos los campos obligatorios.","error");return;}
+  setButtonLoading(button,true,"Enviando…");
+  try{
+    const {error}=await sigecSupabase.from("access_requests").insert({full_name:fullName,email,requested_role:requestedRole,status:"pending"});
+    if(error){ if(String(error.code)==="23505"||String(error.message||"").toLowerCase().includes("duplicate")) throw new Error("Ya existe una solicitud pendiente asociada a este correo."); throw error; }
+    closeAccessRequestModal();
+    showToast("Solicitud enviada. Un administrador deberá revisarla antes de crear la cuenta.","success");
+  }catch(error){showToast(readableError(error),"error");}
+  finally{setButtonLoading(button,false);}
+});
+
+async function fetchAccessRequests(){
+  if(state.profile?.role!=="admin")throw new Error("Solo un administrador puede consultar solicitudes.");
+  const {data,error}=await sigecSupabase.from("access_requests").select("id,full_name,email,requested_role,status,rejection_reason,created_at,reviewed_at").order("created_at",{ascending:false});
+  if(error)throw error; state.accessRequests=data||[]; updatePendingRequestBadge(); return state.accessRequests;
+}
+function accessStatusLabel(status){return {pending:"Pendiente",approved:"Aprobada",rejected:"Rechazada"}[status]||status;}
+function updatePendingRequestBadge(){const badge=$("pending-requests-badge");if(!badge)return;const pending=state.accessRequests.filter(r=>r.status==="pending").length;badge.textContent=String(pending);badge.classList.toggle("hidden",pending===0);}
+function renderAccessRequests(requests=state.accessRequests){
+  const search=($("request-search")?.value||"").trim().toLowerCase(); const statusFilter=$("request-status-filter")?.value??"pending";
+  $("request-stat-pending").textContent=requests.filter(r=>r.status==="pending").length;
+  $("request-stat-approved").textContent=requests.filter(r=>r.status==="approved").length;
+  $("request-stat-rejected").textContent=requests.filter(r=>r.status==="rejected").length;
+  const filtered=requests.filter(r=>(String(r.full_name||"").toLowerCase().includes(search)||String(r.email||"").toLowerCase().includes(search))&&(!statusFilter||r.status===statusFilter));
+  $("access-requests-table").innerHTML=filtered.length?filtered.map(r=>`<tr><td>${escapeHtml(r.full_name)}</td><td>${escapeHtml(r.email)}</td><td><span class="request-role">${escapeHtml(roleLabel(r.requested_role))}</span></td><td>${escapeHtml(formatDate(r.created_at))}</td><td><span class="request-status ${escapeHtml(r.status)}">${escapeHtml(accessStatusLabel(r.status))}</span></td><td>${r.status==="pending"?`<div class="table-actions"><button class="table-action approve" data-approve-request="${escapeHtml(r.id)}"><i class="fa-solid fa-check"></i>Aprobar</button><button class="table-action reject" data-reject-request="${escapeHtml(r.id)}"><i class="fa-solid fa-xmark"></i>Rechazar</button></div>`:(r.status==="rejected"&&r.rejection_reason?escapeHtml(r.rejection_reason):"—")}</td></tr>`).join(""):emptyRow(6,"No se encontraron solicitudes.");
+  bindAccessRequestActions();
+}
+function bindAccessRequestActions(){qsa("[data-approve-request]").forEach(b=>b.addEventListener("click",()=>approveAccessRequest(b.dataset.approveRequest,b)));qsa("[data-reject-request]").forEach(b=>b.addEventListener("click",()=>openRejectRequestModal(b.dataset.rejectRequest)));}
+async function approveAccessRequest(requestId,button){
+  const req=state.accessRequests.find(r=>r.id===requestId);if(!req)return;
+  if(!window.confirm(`¿Desea aprobar a ${req.full_name} como ${roleLabel(req.requested_role)}?`))return;
+  setButtonLoading(button,true,"Aprobando…");
+  try{const {data,error}=await sigecSupabase.functions.invoke("approve-access-request",{body:{requestId}});if(error)throw error;if(!data?.success)throw new Error(data?.error||"No fue posible aprobar la solicitud.");renderAccessRequests(await fetchAccessRequests());try{renderUsers(await fetchUsers());}catch{}showToast("Solicitud aprobada. Supabase envió la invitación al nuevo usuario.","success");}
+  catch(error){showToast(readableError(error),"error");}finally{setButtonLoading(button,false);}
+}
+function openRejectRequestModal(id){$("reject-request-id").value=id;$("rejection-reason").value="";$("reject-request-modal").classList.remove("hidden");$("rejection-reason").focus();}
+function closeRejectRequestModal(){$("reject-request-modal").classList.add("hidden");$("reject-request-form").reset();}
+$("close-reject-request")?.addEventListener("click",closeRejectRequestModal);$("cancel-reject-request")?.addEventListener("click",closeRejectRequestModal);$("reject-request-modal")?.addEventListener("click",e=>{if(e.target.id==="reject-request-modal")closeRejectRequestModal();});
+$("reject-request-form")?.addEventListener("submit",async(event)=>{event.preventDefault();const requestId=$("reject-request-id").value;const reason=$("rejection-reason").value.trim()||null;const button=event.submitter;setButtonLoading(button,true,"Rechazando…");try{const {error}=await sigecSupabase.rpc("reject_access_request",{request_id:requestId,reason});if(error)throw error;closeRejectRequestModal();renderAccessRequests(await fetchAccessRequests());showToast("Solicitud rechazada.","success");}catch(error){showToast(readableError(error),"error");}finally{setButtonLoading(button,false);}});
+$("refresh-access-requests")?.addEventListener("click",async()=>{const button=$("refresh-access-requests");setButtonLoading(button,true,"Actualizando…");try{renderAccessRequests(await fetchAccessRequests());showToast("Solicitudes actualizadas.","success");}catch(error){showToast(readableError(error),"error");}finally{setButtonLoading(button,false);}});
+$("request-search")?.addEventListener("input",()=>renderAccessRequests());$("request-status-filter")?.addEventListener("change",()=>renderAccessRequests());
 
 /* ------------------------------------------------------------
  * 8. ADMINISTRACIÓN DE USUARIOS

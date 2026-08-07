@@ -49,6 +49,11 @@
             Ingresar
           </button>
 
+          <div class="request-access-box">
+            <span>¿Todavía no tiene una cuenta?</span>
+            <button type="button" id="open-access-request" class="text-button">Solicitar acceso a SIGEC</button>
+          </div>
+
           <p class="login-note">El acceso se valida de forma segura mediante Supabase Auth.</p>
         </form>
       </div>
@@ -103,6 +108,11 @@
           <div class="nav-section admin-only">
             <span>Administración</span><div></div>
           </div>
+
+          <button class="nav-link admin-only" data-view="solicitudes">
+            <i class="fa-regular fa-id-card"></i><span>Solicitudes de Acceso</span>
+            <span id="pending-requests-badge" class="nav-count hidden">0</span>
+          </button>
 
           <button class="nav-link admin-only" data-view="usuarios">
             <i class="fa-regular fa-user"></i><span>Usuarios</span>
@@ -462,6 +472,31 @@
             <div class="data-card"><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Formulario</th><th>Centro</th><th>Estado</th></tr></thead><tbody id="my-submissions-table"></tbody></table></div></div>
           </section>
 
+          <section id="solicitudes" class="content-view hidden">
+            <div class="page-heading">
+              <div>
+                <span class="soft-badge">Administración</span>
+                <h1>Solicitudes de Acceso</h1>
+                <p>Revise, apruebe o rechace las solicitudes pendientes de ingreso a SIGEC.</p>
+              </div>
+              <button id="refresh-access-requests" class="btn btn-light"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+            </div>
+            <div class="request-summary-grid">
+              <article class="request-summary-card"><span>Pendientes</span><strong id="request-stat-pending">0</strong></article>
+              <article class="request-summary-card"><span>Aprobadas</span><strong id="request-stat-approved">0</strong></article>
+              <article class="request-summary-card"><span>Rechazadas</span><strong id="request-stat-rejected">0</strong></article>
+            </div>
+            <div class="data-card">
+              <div class="table-toolbar users-toolbar">
+                <div class="search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="request-search" placeholder="Buscar por nombre o correo..." /></div>
+                <select id="request-status-filter" class="compact-select">
+                  <option value="pending">Pendientes</option><option value="">Todos los estados</option><option value="approved">Aprobadas</option><option value="rejected">Rechazadas</option>
+                </select>
+              </div>
+              <div class="table-wrap"><table><thead><tr><th>Persona</th><th>Correo</th><th>Rol solicitado</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="access-requests-table"></tbody></table></div>
+            </div>
+          </section>
+
           <section id="usuarios" class="content-view hidden">
             <div class="page-heading">
               <div>
@@ -520,6 +555,25 @@
     </section>
   </div>
 
+
+  <div id="access-request-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="access-request-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div><span class="soft-badge">Solicitud de acceso</span><h2 id="access-request-title">Solicitar acceso a SIGEC</h2><p>Complete la información. Un administrador revisará la solicitud antes de crear la cuenta.</p></div>
+        <button id="close-access-request" class="icon-button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="access-request-form">
+        <div class="form-grid two">
+          <div class="field full"><label for="request-full-name">Nombre completo *</label><input id="request-full-name" autocomplete="name" required /></div>
+          <div class="field full"><label for="request-email">Correo electrónico *</label><input id="request-email" type="email" autocomplete="email" required /></div>
+          <div class="field full"><label for="request-role">Tipo de acceso solicitado *</label><select id="request-role" required><option value="">Seleccione un rol</option><option value="centro">Centro educativo</option><option value="consulta">Consulta y seguimiento</option><option value="admin">Administrador</option></select></div>
+        </div>
+        <div id="request-admin-warning" class="modal-notice warning hidden"><i class="fa-solid fa-triangle-exclamation"></i><span>Está solicitando permisos administrativos. La cuenta no recibirá este rol hasta que un administrador actual la apruebe.</span></div>
+        <div class="modal-notice"><i class="fa-solid fa-circle-info"></i><span>Enviar esta solicitud no crea una cuenta todavía. Si es aprobada, recibirá una invitación para establecer su contraseña.</span></div>
+        <div class="form-actions"><button type="button" id="cancel-access-request" class="btn btn-light">Cancelar</button><button type="submit" class="btn btn-primary"><i class="fa-regular fa-paper-plane"></i> Enviar solicitud</button></div>
+      </form>
+    </div>
+  </div>
 
   <div id="invite-user-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
     <div class="modal-card">
@@ -587,6 +641,13 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="reject-request-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reject-request-title">
+    <div class="modal-card small-modal">
+      <div class="modal-header"><div><span class="soft-badge">Administración</span><h2 id="reject-request-title">Rechazar solicitud</h2><p>Puede indicar un motivo interno para dejar documentada la decisión.</p></div><button id="close-reject-request" class="icon-button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="reject-request-form"><input id="reject-request-id" type="hidden" /><div class="field"><label for="rejection-reason">Motivo del rechazo</label><textarea id="rejection-reason" rows="4" placeholder="Opcional"></textarea></div><div class="form-actions"><button type="button" id="cancel-reject-request" class="btn btn-light">Cancelar</button><button type="submit" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Rechazar solicitud</button></div></form>
     </div>
   </div>
 

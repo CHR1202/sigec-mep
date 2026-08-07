@@ -361,3 +361,14 @@ button:disabled{
     padding:18px;
   }
 }
+
+
+/* Solicitudes de acceso */
+.request-access-box{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:5px;font-size:12px;color:var(--muted)}
+.text-button{border:0;padding:3px 4px;background:transparent;color:var(--blue);font-weight:700;text-decoration:underline;text-underline-offset:2px}.text-button:hover{color:#1f4fab}
+.nav-count{margin-left:auto;min-width:20px;height:20px;display:inline-grid;place-items:center;padding:0 5px;border-radius:999px;background:#ff8a00;color:#fff;font-size:9px;font-weight:800}
+.request-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.request-summary-card{min-height:95px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px;border:1px solid #eaf0f6;border-radius:12px;background:#fff;box-shadow:var(--shadow)}.request-summary-card span{color:var(--muted);font-size:12px;font-weight:700}.request-summary-card strong{color:var(--blue);font-size:28px}
+.request-role,.request-status{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:700}.request-role{background:#edf3ff;color:#2f65d9}.request-status.pending{background:#fff4df;color:#b56c00}.request-status.approved{background:#e8f8f2;color:#087a58}.request-status.rejected{background:#fff1f1;color:#aa3333}
+.table-actions{display:flex;align-items:center;gap:7px}.table-action{min-height:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;border-radius:7px;font-size:10px;font-weight:700}.table-action.approve{border:1px solid #bce7d6;background:#eefaf5;color:#087a58}.table-action.reject{border:1px solid #f2c8c8;background:#fff6f6;color:#aa3333}
+.modal-notice.warning{background:#fff4df;color:#945b06}textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--text);outline:none;resize:vertical;font:inherit}textarea:focus{border-color:#7d9ce8;box-shadow:0 0 0 3px rgba(47,101,217,.12)}.small-modal{width:min(520px,100%)}
+@media(max-width:650px){.request-summary-grid{grid-template-columns:1fr}.table-actions{align-items:stretch;flex-direction:column}}
